@@ -11,7 +11,7 @@ CREATE TABLE roles (
 CREATE TABLE permissions (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     name VARCHAR(100) NOT NULL,
-    slug VARCHAR(100) UNIQUE NOT NULL, -- order.create, order.delete, user.manage
+    slug VARCHAR(100) UNIQUE NOT NULL, -- order.create, order.delete
     description TEXT,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
