@@ -11,6 +11,7 @@ import (
 	"time"
 
 	"cafe/bootstrap"
+	"cafe/database/seed"
 
 	_ "github.com/jackc/pgx/v5/stdlib"
 	"github.com/pressly/goose/v3"
@@ -81,7 +82,17 @@ func main() {
 		return
 	}
 
+	// Check version before Up
+	initialVersion, _ := goose.GetDBVersion(db)
+
 	if err := goose.Run(command, db, migrationsDir, os.Args[2:]...); err != nil {
 		log.Fatalf("goose run failed: %v", err)
+	}
+
+	// If it was up command and version was 0, run seed
+	if command == "up" && initialVersion == 0 {
+		gormDB := bootstrap.NewPostgresDatabase(env)
+		defer bootstrap.ClosePostgresDBConnection(gormDB)
+		seed.Seed(gormDB, env)
 	}
 }

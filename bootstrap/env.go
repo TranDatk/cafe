@@ -7,14 +7,21 @@ import (
 )
 
 type Env struct {
-	AppEnv         string `mapstructure:"APP_ENV"`
-	ServerAddress  string `mapstructure:"SERVER_ADDRESS"`
-	ContextTimeout int    `mapstructure:"CONTEXT_TIMEOUT"`
-	DBHost         string `mapstructure:"DB_HOST"`
-	DBPort         string `mapstructure:"DB_PORT"`
-	DBUser         string `mapstructure:"DB_USER"`
-	DBPass         string `mapstructure:"DB_PASS"`
-	DBName         string `mapstructure:"DB_NAME"`
+	AppEnv                 string `mapstructure:"APP_ENV"`
+	ServerAddress          string `mapstructure:"SERVER_ADDRESS"`
+	ContextTimeout         int    `mapstructure:"CONTEXT_TIMEOUT"`
+	DBHost                 string `mapstructure:"DB_HOST"`
+	DBPort                 string `mapstructure:"DB_PORT"`
+	DBUser                 string `mapstructure:"DB_USER"`
+	DBPass                 string `mapstructure:"DB_PASS"`
+	DBName                 string `mapstructure:"DB_NAME"`
+	AccessTokenSecret      string `mapstructure:"ACCESS_TOKEN_SECRET"`
+	AccessTokenExpiryHour  int    `mapstructure:"ACCESS_TOKEN_EXPIRY_HOUR"`
+	RefreshTokenSecret     string `mapstructure:"REFRESH_TOKEN_SECRET"`
+	RefreshTokenExpiryHour int    `mapstructure:"REFRESH_TOKEN_EXPIRY_HOUR"`
+	SeedAdminUsername      string `mapstructure:"SEED_ADMIN_USERNAME"`
+	SeedAdminEmail         string `mapstructure:"SEED_ADMIN_EMAIL"`
+	SeedAdminPassword      string `mapstructure:"SEED_ADMIN_PASSWORD"`
 }
 
 func NewEnv() *Env {
