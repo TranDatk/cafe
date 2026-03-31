@@ -50,5 +50,5 @@ func (ur *userRepository) GetByID(c context.Context, id string) (domain.User, er
 }
 
 func (ur *userRepository) AssignRole(c context.Context, user *domain.User, role *domain.Role) error {
-	return ur.getDB(c).WithContext(c).Model(user).Association("Roles").Append(role)
+	return ur.getDB(c).WithContext(c).Model(user).Association(domain.UserAssociationRoles).Append(role)
 }

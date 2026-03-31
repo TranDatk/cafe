@@ -6,7 +6,8 @@ import (
 )
 
 const (
-	TableUser = "users"
+	TableUser            = "users"
+	UserAssociationRoles = "Roles"
 )
 
 type User struct {
