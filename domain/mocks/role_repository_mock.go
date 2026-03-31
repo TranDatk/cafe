@@ -16,9 +16,9 @@ func (m *RoleRepository) Create(c context.Context, role *domain.Role) error {
 	return args.Error(0)
 }
 
-func (m *RoleRepository) Fetch(c context.Context) ([]domain.Role, error) {
-	args := m.Called(c)
-	return args.Get(0).([]domain.Role), args.Error(1)
+func (m *RoleRepository) Fetch(c context.Context, opts domain.RoleFetchOptions) ([]domain.Role, int64, error) {
+	args := m.Called(c, opts)
+	return args.Get(0).([]domain.Role), int64(args.Int(1)), args.Error(2)
 }
 
 func (m *RoleRepository) GetByID(c context.Context, id string) (domain.Role, error) {

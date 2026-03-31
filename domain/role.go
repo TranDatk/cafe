@@ -19,9 +19,20 @@ type Role struct {
 	CreatedAt   time.Time `gorm:"column:created_at" json:"created_at"`
 }
 
+type RoleFetchOptions struct {
+	Page     int `json:"page"`
+	PageSize int `json:"page_size"`
+	SortOption
+	Filters []Criterion
+}
+
+type RoleUsecase interface {
+	Fetch(c context.Context, opts RoleFetchOptions) ([]Role, int64, error)
+}
+
 type RoleRepository interface {
 	Create(c context.Context, role *Role) error
-	Fetch(c context.Context) ([]Role, error)
+	Fetch(c context.Context, opts RoleFetchOptions) ([]Role, int64, error)
 	GetByID(c context.Context, id string) (Role, error)
 	GetByName(c context.Context, name string) (Role, error)
 }

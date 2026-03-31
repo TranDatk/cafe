@@ -4,9 +4,18 @@ import (
 	"context"
 
 	"cafe/domain"
+	"cafe/internal/pagination_util"
 
 	"gorm.io/gorm"
 )
+
+var userFilterWhitelist = map[string]string{
+	"id":        "id",
+	"name":      "name",
+	"email":     "email",
+	"createdAt": "created_at",
+	"updatedAt": "updated_at",
+}
 
 type userRepository struct {
 	database *gorm.DB
@@ -31,10 +40,24 @@ func (ur *userRepository) Create(c context.Context, user *domain.User) error {
 	return ur.getDB(c).WithContext(c).Table(ur.table).Create(user).Error
 }
 
-func (ur *userRepository) Fetch(c context.Context) ([]domain.User, error) {
+func (ur *userRepository) Fetch(c context.Context, opts domain.UserFetchOptions) ([]domain.User, int64, error) {
 	var users []domain.User
-	err := ur.getDB(c).WithContext(c).Table(ur.table).Find(&users).Error
-	return users, err
+	var total int64
+
+	db := ur.getDB(c).WithContext(c).Table(ur.table)
+
+	db = db.Scopes(pagination_util.Filter(opts.Filters, userFilterWhitelist))
+
+	if err := db.Count(&total).Error; err != nil {
+		return nil, 0, err
+	}
+
+	err := db.Scopes(
+		pagination_util.Sort(opts.Field, opts.SortOrder, userFilterWhitelist, userFilterWhitelist["id"]),
+		pagination_util.Paginate(opts.Page, opts.PageSize),
+	).Find(&users).Error
+
+	return users, total, err
 }
 
 func (ur *userRepository) GetByEmail(c context.Context, email string) (domain.User, error) {
