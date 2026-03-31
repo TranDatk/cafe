@@ -68,7 +68,20 @@ Quy trình bao gồm các bước validate dữ liệu, kiểm tra trùng email,
 
 ---
 
-### Bước 7: Tạo Access Token
+### Bước 7: Lưu user vào database
+- Gọi:
+  `SignupUsecase.Create`
+
+- Chèn user vào bảng `users`, nếu thành công thì gán role "user" cho user.
+
+- Nếu lỗi:
+  → Trả về `500 Internal Server Error`
+
+---
+
+---
+
+### Bước 8: Tạo Access Token
 - Gọi:
   `CreateAccessToken`
 - Sử dụng:
@@ -80,7 +93,7 @@ Quy trình bao gồm các bước validate dữ liệu, kiểm tra trùng email,
 
 ---
 
-### Bước 8: Tạo Refresh Token
+### Bước 9: Tạo Refresh Token
 - Gọi:
   `CreateRefreshToken`
 - Sử dụng:
@@ -90,18 +103,6 @@ Quy trình bao gồm các bước validate dữ liệu, kiểm tra trùng email,
 - Nếu lỗi:
   → Trả về `500 Internal Server Error`
 
----
-
-### Bước 9: Lưu user vào database
-- Gọi:
-  `SignupUsecase.Create`
-
-- Chèn user vào bảng `users`, nếu thành công thì gán role "user" cho user.
-
-- Nếu lỗi:
-  → Trả về `500 Internal Server Error`
-
----
 
 ### Bước 10: Trả response về client
 - Trả về:

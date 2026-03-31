@@ -6,7 +6,8 @@ import (
 )
 
 const (
-	TableUser = "users"
+	TableUser            = "users"
+	UserAssociationRoles = "Roles"
 )
 
 type User struct {
@@ -21,8 +22,28 @@ type User struct {
 
 type UserRepository interface {
 	Create(c context.Context, user *User) error
-	Fetch(c context.Context) ([]User, error)
+	Fetch(c context.Context, opts UserFetchOptions) ([]User, int64, error)
 	GetByEmail(c context.Context, email string) (User, error)
 	GetByID(c context.Context, id string) (User, error)
 	AssignRole(c context.Context, user *User, role *Role) error
+}
+
+type UserFetchOptions struct {
+	Page     int `form:"page" binding:"omitempty"`
+	PageSize int `form:"page_size" binding:"omitempty"`
+	SortOption
+	Filters []Criterion
+}
+
+func (o *UserFetchOptions) Prepare() {
+	if o.Page <= 0 {
+		o.Page = 1
+	}
+	if o.PageSize <= 0 {
+		o.PageSize = 10
+	}
+}
+
+type UserUsecase interface {
+	Fetch(c context.Context, opts UserFetchOptions) ([]User, int64, error)
 }
