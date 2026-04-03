@@ -7,11 +7,19 @@ import (
 	"cafe/domain"
 
 	jwt "github.com/golang-jwt/jwt/v5"
+	"github.com/google/uuid"
 )
 
 func CreateAccessToken(user *domain.User, secret string, expiry int) (accessToken string, err error) {
 	exp := time.Now().Add(time.Hour * time.Duration(expiry)).Unix()
+
+	tokenID, err := uuid.NewV7()
+	if err != nil {
+		return "", err
+	}
+
 	claims := &domain.JwtCustomClaims{
+		ID:     tokenID.String(),
 		Name:   user.Name,
 		UserID: user.ID,
 		RegisteredClaims: jwt.RegisteredClaims{
@@ -27,12 +35,19 @@ func CreateAccessToken(user *domain.User, secret string, expiry int) (accessToke
 }
 
 func CreateRefreshToken(user *domain.User, secret string, expiry int) (refreshToken string, err error) {
+	tokenID, err := uuid.NewV7()
+	if err != nil {
+		return "", err
+	}
+
 	claimsRefresh := &domain.JwtCustomRefreshClaims{
+		ID:     tokenID.String(),
 		UserID: user.ID,
 		RegisteredClaims: jwt.RegisteredClaims{
 			ExpiresAt: jwt.NewNumericDate(time.Unix(time.Now().Add(time.Hour*time.Duration(expiry)).Unix(), 0)),
 		},
 	}
+
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claimsRefresh)
 	rt, err := token.SignedString([]byte(secret))
 	if err != nil {

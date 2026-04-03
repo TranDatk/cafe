@@ -5,12 +5,14 @@ import (
 )
 
 type JwtCustomClaims struct {
+	ID     string `json:"id"`
 	Name   string `json:"name"`
-	UserID string `json:"id"`
+	UserID string `json:"user_id"`
 	jwt.RegisteredClaims
 }
 
 type JwtCustomRefreshClaims struct {
-	UserID string `json:"id"`
+	ID     string `json:"id"`
+	UserID string `json:"user_id"`
 	jwt.RegisteredClaims
 }
