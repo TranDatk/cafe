@@ -1,16 +1,15 @@
 package middleware
 
 import (
-	"net/http"
-	"strings"
-
 	"cafe/domain"
 	tokenutil "cafe/internal/token_util"
+	"net/http"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 )
 
-func JwtAuthMiddleware(secret string) gin.HandlerFunc {
+func JwtAuthMiddleware(secret string, blacklistService domain.BlacklistService) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		authHeader := c.GetHeader("Authorization")
 		t := strings.Split(authHeader, " ")
@@ -22,7 +21,17 @@ func JwtAuthMiddleware(secret string) gin.HandlerFunc {
 				c.Abort()
 				return
 			}
-			c.Set("x-user-id", claims.ID)
+
+			// Blacklist Check
+			isBlacklisted, _ := blacklistService.IsBlacklisted(c, claims.RefreshTokenID)
+			if isBlacklisted {
+				c.JSON(http.StatusUnauthorized, domain.ErrorResponse{Message: "Not authorized"})
+				c.Abort()
+				return
+			}
+
+			c.Set("x-user-id", claims.UserID)
+			c.Set("x-refresh-token-id", claims.RefreshTokenID)
 			c.Next()
 			return
 		}

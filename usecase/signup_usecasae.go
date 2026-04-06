@@ -9,18 +9,20 @@ import (
 )
 
 type signupUsecase struct {
-	userRepository domain.UserRepository
-	roleRepository domain.RoleRepository
-	transaction    domain.Transaction
-	contextTimeout time.Duration
+	userRepository         domain.UserRepository
+	roleRepository         domain.RoleRepository
+	refreshTokenRepository domain.RefreshTokenRepository
+	transaction            domain.Transaction
+	contextTimeout         time.Duration
 }
 
-func NewSignupUsecase(userRepository domain.UserRepository, roleRepository domain.RoleRepository, transaction domain.Transaction, timeout time.Duration) domain.SignupUsecase {
+func NewSignupUsecase(userRepository domain.UserRepository, roleRepository domain.RoleRepository, refreshTokenRepository domain.RefreshTokenRepository, transaction domain.Transaction, timeout time.Duration) domain.SignupUsecase {
 	return &signupUsecase{
-		userRepository: userRepository,
-		roleRepository: roleRepository,
-		transaction:    transaction,
-		contextTimeout: timeout,
+		userRepository:         userRepository,
+		roleRepository:         roleRepository,
+		refreshTokenRepository: refreshTokenRepository,
+		transaction:            transaction,
+		contextTimeout:         timeout,
 	}
 }
 
@@ -52,10 +54,17 @@ func (su *signupUsecase) Create(c context.Context, user *domain.User) error {
 	})
 }
 
-func (su *signupUsecase) CreateAccessToken(user *domain.User, secret string, expiry int) (string, error) {
-	return tokenutil.CreateAccessToken(user, secret, expiry)
+func (su *signupUsecase) CreateAccessToken(user *domain.User, refreshTokenID string, secret string, expiry int) (string, string, error) {
+	return tokenutil.CreateAccessToken(user, refreshTokenID, secret, expiry)
 }
 
-func (su *signupUsecase) CreateRefreshToken(user *domain.User, secret string, expiry int) (string, error) {
+func (su *signupUsecase) CreateRefreshToken(user *domain.User, secret string, expiry int) (string, string, error) {
 	return tokenutil.CreateRefreshToken(user, secret, expiry)
+}
+
+func (su *signupUsecase) SaveRefreshToken(c context.Context, refreshToken *domain.UserRefreshToken) error {
+	ctx, cancel := context.WithTimeout(c, su.contextTimeout)
+	defer cancel()
+
+	return su.refreshTokenRepository.Create(ctx, refreshToken)
 }

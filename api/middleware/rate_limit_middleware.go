@@ -26,7 +26,7 @@ func init() {
 			clients.Range(func(key, value interface{}) bool {
 				ip := key.(string)
 				c := value.(*client)
-				
+
 				c.mu.Lock()
 				isInactive := time.Since(c.lastSeen) > 3*time.Minute
 				c.mu.Unlock()
@@ -50,7 +50,7 @@ func RateLimitMiddleware(requestsPerSecond float64, burst int) gin.HandlerFunc {
 			limiter:  rate.NewLimiter(rate.Limit(requestsPerSecond), burst),
 			lastSeen: time.Now(),
 		})
-		
+
 		client := val.(*client)
 
 		// Update last seen time under client lock

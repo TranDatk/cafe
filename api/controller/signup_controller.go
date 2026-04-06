@@ -2,6 +2,7 @@ package controller
 
 import (
 	"net/http"
+	"time"
 
 	"cafe/bootstrap"
 	"cafe/domain"
@@ -55,13 +56,23 @@ func (sc *SignupController) Signup(c *gin.Context) {
 		Password: request.Password,
 	}
 
-	accessToken, err := sc.SignupUsecase.CreateAccessToken(&user, sc.Env.AccessTokenSecret, sc.Env.AccessTokenExpiryHour)
+	refreshToken, refreshTokenID, err := sc.SignupUsecase.CreateRefreshToken(&user, sc.Env.RefreshTokenSecret, sc.Env.RefreshTokenExpiryHour)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, domain.ErrorResponse{Message: err.Error()})
 		return
 	}
 
-	refreshToken, err := sc.SignupUsecase.CreateRefreshToken(&user, sc.Env.RefreshTokenSecret, sc.Env.RefreshTokenExpiryHour)
+	accessToken, _, err := sc.SignupUsecase.CreateAccessToken(&user, refreshTokenID, sc.Env.AccessTokenSecret, sc.Env.AccessTokenExpiryHour)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, domain.ErrorResponse{Message: err.Error()})
+		return
+	}
+
+	err = sc.SignupUsecase.SaveRefreshToken(c, &domain.UserRefreshToken{
+		UserID:    user.ID,
+		TokenID:   refreshTokenID,
+		ExpiresAt: time.Now().Add(time.Hour * time.Duration(sc.Env.RefreshTokenExpiryHour)),
+	})
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, domain.ErrorResponse{Message: err.Error()})
 		return
@@ -77,6 +88,8 @@ func (sc *SignupController) Signup(c *gin.Context) {
 		AccessToken:  accessToken,
 		RefreshToken: refreshToken,
 	}
+
+	c.SetCookie("refresh_token", refreshToken, sc.Env.RefreshTokenExpiryHour*3600, "/", "", sc.Env.AppEnv == "production", true)
 
 	c.JSON(http.StatusOK, signupResponse)
 }

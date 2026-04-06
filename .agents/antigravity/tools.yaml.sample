@@ -1,0 +1,8 @@
+sources:
+  my-pg-source:
+    kind: postgres
+    host: 
+    port: 
+    database: 
+    user: 
+    password: 
