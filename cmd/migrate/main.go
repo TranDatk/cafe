@@ -18,7 +18,7 @@ import (
 )
 
 const (
-	dialect     = "postgres"
+	dialect       = "postgres"
 	migrationsDir = "database/migrations"
 )
 

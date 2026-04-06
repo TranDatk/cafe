@@ -22,6 +22,10 @@ type Env struct {
 	SeedAdminUsername      string `mapstructure:"SEED_ADMIN_USERNAME"`
 	SeedAdminEmail         string `mapstructure:"SEED_ADMIN_EMAIL"`
 	SeedAdminPassword      string `mapstructure:"SEED_ADMIN_PASSWORD"`
+	SessionCount           int    `mapstructure:"SESSION_COUNT"`
+	RedisHost              string `mapstructure:"REDIS_HOST"`
+	RedisUsername          string `mapstructure:"REDIS_USERNAME"`
+	RedisPass              string `mapstructure:"REDIS_PASS"`
 }
 
 func NewEnv() *Env {

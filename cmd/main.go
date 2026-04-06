@@ -18,7 +18,7 @@ func main() {
 
 	router := gin.Default()
 
-	route.Setup(app.Env, timeout, app.DB, router)
+	route.Setup(app.Env, timeout, app.DB, app.Redis, router)
 
 	router.GET("/ping", func(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{

@@ -16,6 +16,7 @@ func TestCreate_Success(t *testing.T) {
 	mockUserRepo := new(mocks.UserRepository)
 	mockRoleRepo := new(mocks.RoleRepository)
 	mockRowTx := new(mocks.Transaction)
+	mockRefreshTokenRepo := new(mocks.RefreshTokenRepository)
 
 	user := &domain.User{
 		ID:    "1",
@@ -38,7 +39,7 @@ func TestCreate_Success(t *testing.T) {
 	mockRoleRepo.On("GetByName", mock.Anything, domain.UserRole).Return(role, nil)
 	mockUserRepo.On("AssignRole", mock.Anything, user, &role).Return(nil)
 
-	usecase := NewSignupUsecase(mockUserRepo, mockRoleRepo, mockRowTx, time.Second*2)
+	usecase := NewSignupUsecase(mockUserRepo, mockRoleRepo, mockRefreshTokenRepo, mockRowTx, time.Second*2)
 
 	err := usecase.Create(context.Background(), user)
 
@@ -52,6 +53,7 @@ func TestCreate_UserCreateError(t *testing.T) {
 	mockUserRepo := new(mocks.UserRepository)
 	mockRoleRepo := new(mocks.RoleRepository)
 	mockRowTx := new(mocks.Transaction)
+	mockRefreshTokenRepo := new(mocks.RefreshTokenRepository)
 
 	user := &domain.User{
 		ID:    "1",
@@ -64,7 +66,7 @@ func TestCreate_UserCreateError(t *testing.T) {
 	// Expect WithinTransaction to return the error from the function
 	mockRowTx.On("WithinTransaction", mock.Anything, mock.Anything).Return(expectedErr)
 
-	usecase := NewSignupUsecase(mockUserRepo, mockRoleRepo, mockRowTx, time.Second*2)
+	usecase := NewSignupUsecase(mockUserRepo, mockRoleRepo, mockRefreshTokenRepo, mockRowTx, time.Second*2)
 
 	err := usecase.Create(context.Background(), user)
 
@@ -76,6 +78,7 @@ func TestCreate_RoleNotFoundError(t *testing.T) {
 	mockUserRepo := new(mocks.UserRepository)
 	mockRoleRepo := new(mocks.RoleRepository)
 	mockRowTx := new(mocks.Transaction)
+	mockRefreshTokenRepo := new(mocks.RefreshTokenRepository)
 
 	user := &domain.User{
 		ID:    "1",
@@ -87,7 +90,7 @@ func TestCreate_RoleNotFoundError(t *testing.T) {
 
 	mockRowTx.On("WithinTransaction", mock.Anything, mock.Anything).Return(expectedErr)
 
-	usecase := NewSignupUsecase(mockUserRepo, mockRoleRepo, mockRowTx, time.Second*2)
+	usecase := NewSignupUsecase(mockUserRepo, mockRoleRepo, mockRefreshTokenRepo, mockRowTx, time.Second*2)
 
 	err := usecase.Create(context.Background(), user)
 
