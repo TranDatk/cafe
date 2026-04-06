@@ -9,13 +9,11 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
-	"github.com/redis/go-redis/v9"
 	"gorm.io/gorm"
 )
 
-func NewLogoutRouter(env *bootstrap.Env, timeout time.Duration, db *gorm.DB, rdb *redis.Client, group *gin.RouterGroup) {
+func NewLogoutRouter(env *bootstrap.Env, timeout time.Duration, db *gorm.DB, br domain.BlacklistService, group *gin.RouterGroup) {
 	rtr := repository.NewRefreshTokenRepository(db, domain.TableUserRefreshToken)
-	br := repository.NewRedisBlacklistRepository(rdb, "blacklist:")
 
 	lc := &controller.LogoutController{
 		LogoutUsecase: usecase.NewLogoutUsecase(rtr, br, timeout),

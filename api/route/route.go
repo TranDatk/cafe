@@ -20,19 +20,19 @@ func Setup(env *bootstrap.Env, timeout time.Duration, db *gorm.DB, rdb *redis.Cl
 	publicRouter := gin.Group("")
 	publicRouter.Use(middleware.RateLimitMiddleware(rateLimitPerSec, burstSize))
 
+	// Initialize BlacklistService for Middleware
+	br := repository.NewRedisBlacklistRepository(rdb, domain.BlacklistKeyPrefix)
+
 	// All Public APIs
 	NewSignupRouter(env, timeout, db, publicRouter)
-	NewLoginRouter(env, timeout, db, rdb, publicRouter)
+	NewLoginRouter(env, timeout, db, br, publicRouter)
 	NewRefreshTokenRouter(env, timeout, db, publicRouter)
 
 	// All Private APIs
 	protectedRouter := gin.Group("")
 
-	// Initialize BlacklistService for Middleware
-	br := repository.NewRedisBlacklistRepository(rdb, domain.BlacklistKeyPrefix)
-
 	// Middleware to verify AccessToken
 	protectedRouter.Use(middleware.JwtAuthMiddleware(env.AccessTokenSecret, br))
 
-	NewLogoutRouter(env, timeout, db, rdb, protectedRouter)
+	NewLogoutRouter(env, timeout, db, br, protectedRouter)
 }
